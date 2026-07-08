@@ -1,0 +1,188 @@
+<div class="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-300 md:bg-transparent bg-white min-h-[100dvh] md:min-h-full">
+  <!-- Header -->
+  <div class="pt-12 md:pt-8 pb-4 px-6 flex items-center justify-between sticky top-0 md:bg-transparent bg-white/80 backdrop-blur-md z-10 md:mb-4">
+    <button
+      type="button"
+      (click)="back.emit()"
+      class="w-10 h-10 rounded-full bg-white md:bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 active:scale-95 transition-colors shadow-sm md:shadow-none"
+    >
+      <svg lucideChevronLeft [size]="20"></svg>
+    </button>
+    <span class="font-semibold text-gray-800 md:text-xl">Practice</span>
+    <div class="w-10"></div>
+  </div>
+
+  <div class="px-6 md:px-8 flex-1 flex flex-col md:flex-row gap-8 pb-8 h-full">
+    <!-- Left Column: Question, breakdown, hints & recording -->
+    <div class="flex-1 flex flex-col md:bg-white md:p-8 md:rounded-[2.5rem] md:shadow-sm">
+      <!-- Question Card -->
+      <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-[2rem] mb-4 border border-blue-100 relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-200 rounded-full blur-2xl opacity-50"></div>
+        <div class="flex items-center gap-2 mb-4 relative z-10">
+          <span class="bg-blue-500 text-white text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-full inline-block shadow-sm">
+            {{ question().category.title }}
+          </span>
+          @if (activeSubQuestion(); as sub) {
+            <span class="bg-white/70 text-blue-600 text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-full inline-block">
+              Part {{ question().subQuestions.indexOf(sub) + 1 }} of {{ question().subQuestions.length }}
+            </span>
+          }
+        </div>
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800 leading-snug relative z-10">
+          "{{ currentPromptText() }}"
+        </h2>
+      </div>
+
+      <!-- Breakdown & hints toggles -->
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        @if (question().subQuestions.length) {
+          <button
+            type="button"
+            (click)="toggleBreakdown()"
+            class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border transition-colors"
+            [class.bg-blue-500]="showBreakdown()"
+            [class.text-white]="showBreakdown()"
+            [class.border-blue-500]="showBreakdown()"
+            [class.bg-white]="!showBreakdown()"
+            [class.text-gray-600]="!showBreakdown()"
+            [class.border-gray-200]="!showBreakdown()"
+          >
+            <svg lucideListTree [size]="16"></svg>
+            Split into sub-questions
+          </button>
+        }
+        @if (question().hints.length) {
+          <button
+            type="button"
+            (click)="toggleHints()"
+            class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border transition-colors"
+            [class.bg-yellow-400]="showHints()"
+            [class.text-white]="showHints()"
+            [class.border-yellow-400]="showHints()"
+            [class.bg-white]="!showHints()"
+            [class.text-gray-600]="!showHints()"
+            [class.border-gray-200]="!showHints()"
+          >
+            <svg lucideLightbulb [size]="16"></svg>
+            {{ showHints() ? 'Hide hints' : 'Show hints' }}
+          </button>
+        }
+      </div>
+
+      <!-- Sub-question chips -->
+      @if (showBreakdown() && question().subQuestions.length) {
+        <div class="flex flex-wrap gap-2 mb-4 animate-in fade-in slide-in-from-top-2 duration-200">
+          <button
+            type="button"
+            (click)="selectPart(null)"
+            class="px-4 py-2 rounded-full text-xs font-bold border transition-colors"
+            [class.bg-blue-500]="activeSubQuestionId() === null"
+            [class.text-white]="activeSubQuestionId() === null"
+            [class.border-blue-500]="activeSubQuestionId() === null"
+            [class.bg-gray-50]="activeSubQuestionId() !== null"
+            [class.text-gray-500]="activeSubQuestionId() !== null"
+            [class.border-gray-200]="activeSubQuestionId() !== null"
+          >
+            Full question
+          </button>
+          @for (sub of question().subQuestions; track sub.id; let i = $index) {
+            <button
+              type="button"
+              (click)="selectPart(sub.id)"
+              class="px-4 py-2 rounded-full text-xs font-bold border transition-colors"
+              [class.bg-blue-500]="activeSubQuestionId() === sub.id"
+              [class.text-white]="activeSubQuestionId() === sub.id"
+              [class.border-blue-500]="activeSubQuestionId() === sub.id"
+              [class.bg-gray-50]="activeSubQuestionId() !== sub.id"
+              [class.text-gray-500]="activeSubQuestionId() !== sub.id"
+              [class.border-gray-200]="activeSubQuestionId() !== sub.id"
+            >
+              Part {{ i + 1 }}
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Hints panel -->
+      @if (showHints() && question().hints.length) {
+        <div class="bg-yellow-50 border border-yellow-100 rounded-2xl p-4 mb-4 animate-in fade-in slide-in-from-top-2 duration-200">
+          <ul class="space-y-2">
+            @for (hint of question().hints; track $index) {
+              <li class="flex items-start gap-2 text-sm text-yellow-800">
+                <svg lucideLightbulb [size]="14" class="mt-0.5 shrink-0 text-yellow-500"></svg>
+                {{ hint }}
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+      <!-- Recording Controls -->
+      <div class="flex flex-col items-center justify-center flex-1 min-h-[250px]">
+        <div
+          class="text-5xl md:text-6xl font-mono mb-8 transition-colors duration-300 tracking-tight"
+          [class.text-red-500]="isRecording()"
+          [class.font-bold]="isRecording()"
+          [class.text-gray-300]="!isRecording()"
+        >
+          {{ formatTime(recordingTime()) }}
+        </div>
+
+        <button
+          type="button"
+          (click)="isRecording() ? stopRecording() : startRecording()"
+          [disabled]="isUploading()"
+          class="w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 disabled:opacity-50"
+          [class.bg-red-50]="isRecording()"
+          [class.text-red-500]="isRecording()"
+          [class.shadow-red-200]="isRecording()"
+          [class.animate-pulse]="isRecording()"
+          [class.scale-110]="isRecording()"
+          [class.bg-blue-500]="!isRecording()"
+          [class.text-white]="!isRecording()"
+          [class.shadow-blue-300]="!isRecording()"
+        >
+          @if (isRecording()) {
+            <svg lucideSquare [size]="36" fill="currentColor"></svg>
+          } @else {
+            <svg lucideMic [size]="40"></svg>
+          }
+        </button>
+        <p class="text-gray-400 text-sm md:text-base mt-6 font-medium">
+          {{ isRecording() ? 'Click to stop recording' : isUploading() ? 'Saving…' : 'Click to start answering' }}
+        </p>
+        @if (saveError()) {
+          <p class="text-red-500 text-sm mt-2 font-medium">{{ saveError() }}</p>
+        }
+      </div>
+    </div>
+
+    <!-- Right Column: Saved Recordings -->
+    <div class="md:w-[350px] lg:w-[400px] flex flex-col h-full">
+      <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-lg">
+        <svg lucideClock [size]="20" class="text-blue-500"></svg>
+        Past Attempts
+        <span class="bg-gray-100 text-gray-500 text-xs py-0.5 px-2 rounded-full ml-auto">
+          {{ currentRecordings().length }}
+        </span>
+      </h3>
+
+      <div class="space-y-3 pb-6 md:overflow-y-auto md:pr-2 flex-1">
+        @if (currentRecordings().length === 0) {
+          <div class="text-center py-12 text-gray-400 text-sm bg-white md:bg-gray-50 rounded-2xl border border-dashed border-gray-200 h-full flex items-center justify-center flex-col min-h-[200px]">
+            <svg lucideClock [size]="32" class="mb-3 text-gray-300"></svg>
+            <p>No recordings yet.<br />Be the first to practice this!</p>
+          </div>
+        } @else {
+          @for (rec of currentRecordings(); track rec.id; let i = $index) {
+            <app-recording-item
+              [recording]="rec"
+              [index]="currentRecordings().length - i"
+              (deleted)="removeRecording(rec.id)"
+            />
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>

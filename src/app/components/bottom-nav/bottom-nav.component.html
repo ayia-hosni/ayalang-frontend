@@ -1,0 +1,19 @@
+<div class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white/90 backdrop-blur-xl px-4 py-3 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex justify-between items-center border border-white z-50">
+  @for (item of navItems; track item.id) {
+    <button
+      type="button"
+      (click)="select(item.id)"
+      class="flex flex-col items-center gap-1 px-3 py-1 rounded-2xl transition-colors duration-200"
+      [class.text-blue-500]="isActive(item.id)"
+      [class.text-gray-400]="!isActive(item.id)"
+    >
+      @switch (item.id) {
+        @case ('home') { <svg lucideHome [size]="22"></svg> }
+        @case ('tips') { <svg lucideLightbulb [size]="22"></svg> }
+        @case ('leaderboard') { <svg lucideTrophy [size]="22"></svg> }
+        @case ('profile') { <svg lucideUser [size]="22"></svg> }
+      }
+      <span class="text-[10px] font-semibold">{{ item.label }}</span>
+    </button>
+  }
+</div>

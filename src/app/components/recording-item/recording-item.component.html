@@ -1,0 +1,20 @@
+<div class="bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+  <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
+    <svg lucidePlay [size]="16"></svg>
+  </div>
+  <div class="flex-1 min-w-0">
+    <div class="flex items-center gap-2">
+      <span class="font-semibold text-gray-800 text-sm">Attempt #{{ index() }}</span>
+      <span class="text-xs text-gray-400 font-mono">{{ formatDuration(recording().duration) }}</span>
+    </div>
+    <p class="text-xs text-gray-400">{{ formatTimestamp(recording().createdAt) }}</p>
+    <audio [src]="recording().playbackUrl" controls class="w-full h-8 mt-2"></audio>
+  </div>
+  <button
+    type="button"
+    (click)="deleted.emit()"
+    class="w-8 h-8 rounded-full flex items-center justify-center text-gray-300 hover:bg-red-50 hover:text-red-400 transition-colors shrink-0"
+  >
+    <svg lucideTrash2 [size]="16"></svg>
+  </button>
+</div>

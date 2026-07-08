@@ -1,0 +1,43 @@
+@if (!auth.ready()) {
+  <div class="min-h-screen flex items-center justify-center bg-[#f4f7fb] text-gray-400 text-sm">Loading…</div>
+} @else if (!auth.isAuthenticated()) {
+  <app-auth-view />
+} @else {
+  <div class="min-h-screen bg-[#f4f7fb] flex flex-col font-sans w-full">
+    <app-top-nav [activeTab]="activeTab()" (tabChange)="setTab($event)" />
+
+    <div class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar pb-24 md:pb-0 h-[100dvh] md:h-[calc(100vh-80px)] w-full relative">
+      <div class="max-w-6xl mx-auto w-full h-full">
+        @switch (activeTab()) {
+          @case ('home') {
+            <app-home-view [totalXP]="auth.currentUser()?.totalXP ?? 0" (selectQuestion)="navigateToQuestion($event)" />
+          }
+          @case ('practice') {
+            @if (selectedQuestion(); as question) {
+              <app-practice-view
+                [question]="question"
+                (back)="navigateHome()"
+                (xpEarned)="onXPEarned($event)"
+              />
+            }
+          }
+          @case ('tips') {
+            <app-tips-view />
+          }
+          @case ('leaderboard') {
+            <app-leaderboard-view />
+          }
+          @case ('profile') {
+            <app-profile-view
+              [totalXP]="auth.currentUser()?.totalXP ?? 0"
+              [displayName]="auth.currentUser()?.displayName ?? 'Candidate'"
+              (logout)="onLogout()"
+            />
+          }
+        }
+      </div>
+    </div>
+
+    <app-bottom-nav [activeTab]="activeTab()" (tabChange)="setTab($event)" />
+  </div>
+}

@@ -1,0 +1,37 @@
+<div class="hidden md:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm z-50 h-[80px] sticky top-0">
+  <div class="flex items-center gap-2 text-blue-500">
+    <svg lucideMic [size]="24"></svg>
+    <h1 class="font-bold text-xl text-gray-800 tracking-tight">Prep<span class="text-blue-500">Master</span></h1>
+  </div>
+
+  <nav class="flex items-center gap-1 bg-gray-50 rounded-full p-1 border border-gray-100">
+    @for (item of navItems; track item.id) {
+      <button
+        type="button"
+        (click)="select(item.id)"
+        class="flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 font-medium"
+        [class.bg-blue-500]="isActive(item.id)"
+        [class.text-white]="isActive(item.id)"
+        [class.shadow-md]="isActive(item.id)"
+        [class.shadow-blue-200]="isActive(item.id)"
+        [class.text-gray-500]="!isActive(item.id)"
+        [class.hover:bg-white]="!isActive(item.id)"
+        [class.hover:text-gray-800]="!isActive(item.id)"
+      >
+        @switch (item.id) {
+          @case ('home') { <svg lucideHome [size]="18"></svg> }
+          @case ('tips') { <svg lucideLightbulb [size]="18"></svg> }
+          @case ('leaderboard') { <svg lucideTrophy [size]="18"></svg> }
+          @case ('profile') { <svg lucideUser [size]="18"></svg> }
+        }
+        {{ item.label }}
+      </button>
+    }
+  </nav>
+
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center border-2 border-white shadow-inner">
+      <span class="text-blue-600 font-bold text-sm">AC</span>
+    </div>
+  </div>
+</div>

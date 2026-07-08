@@ -1,0 +1,25 @@
+<div class="animate-in fade-in slide-in-from-bottom-4 duration-500 px-6 pt-12 md:pt-10 md:px-0 pb-24 md:pb-8">
+  <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">Leaderboard</h1>
+  <p class="text-gray-400 font-medium mb-8">See how your practice streak stacks up.</p>
+
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50">
+    @for (entry of entries; track entry.rank) {
+      <div class="flex items-center gap-4 p-4">
+        <span class="w-8 text-center font-bold text-gray-400">
+          @if (entry.rank === 1) {
+            <svg lucideTrophy [size]="20" class="text-yellow-400 mx-auto"></svg>
+          } @else {
+            #{{ entry.rank }}
+          }
+        </span>
+        <img
+          [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entry.avatarSeed + '&backgroundColor=b6e3f4'"
+          class="w-10 h-10 rounded-full bg-blue-50"
+          alt="{{ entry.name }}"
+        />
+        <span class="flex-1 font-semibold text-gray-800">{{ entry.name }}</span>
+        <span class="font-bold text-blue-500">{{ entry.xp }} XP</span>
+      </div>
+    }
+  </div>
+</div>

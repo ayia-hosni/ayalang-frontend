@@ -1,0 +1,55 @@
+<div class="animate-in fade-in slide-in-from-bottom-4 duration-500 px-6 pt-12 md:pt-10 md:px-0 pb-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <p class="text-gray-400 font-medium">Welcome back</p>
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Ready to practice?</h1>
+    </div>
+    <div class="flex items-center gap-2 bg-yellow-50 text-yellow-600 font-bold px-4 py-2 rounded-full border border-yellow-100">
+      <svg lucideStar [size]="18" class="fill-current"></svg>
+      {{ totalXP() }} XP
+    </div>
+  </div>
+
+  <div class="flex gap-3 mb-8 overflow-x-auto no-scrollbar pb-1">
+    @for (cat of categories(); track cat.id) {
+      <button
+        type="button"
+        (click)="selectCategory(cat.id)"
+        class="flex items-center gap-3 px-5 py-4 rounded-2xl border transition-all duration-200 shrink-0"
+        [class.border-blue-400]="activeCategoryId() === cat.id"
+        [class.bg-blue-50]="activeCategoryId() === cat.id"
+        [class.border-gray-100]="activeCategoryId() !== cat.id"
+        [class.bg-white]="activeCategoryId() !== cat.id"
+      >
+        <span class="w-10 h-10 rounded-xl flex items-center justify-center text-lg {{ cat.color }}">{{ cat.icon }}</span>
+        <span class="text-left">
+          <span class="block font-bold text-gray-800 text-sm">{{ cat.title }}</span>
+          <span class="block text-xs text-gray-400">{{ cat.subtitle }}</span>
+        </span>
+      </button>
+    }
+  </div>
+
+  <div class="space-y-3">
+    @if (loading()) {
+      <div class="text-center py-12 text-gray-400 text-sm">Loading questions…</div>
+    } @else {
+      @for (q of visibleQuestions(); track q.id) {
+        <button
+          type="button"
+          (click)="choose(q)"
+          class="w-full text-left bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-200 flex items-center justify-between gap-4"
+        >
+          <div>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-blue-500">{{ q.category.title }}</span>
+            <p class="text-gray-800 font-semibold mt-1">{{ q.text }}</p>
+            @if (q.subQuestions.length) {
+              <p class="text-xs text-gray-400 mt-1">{{ q.subQuestions.length }} sub-questions · {{ q.hints.length }} hints</p>
+            }
+          </div>
+          <svg lucideChevronRight [size]="20" class="text-gray-300 shrink-0"></svg>
+        </button>
+      }
+    }
+  </div>
+</div>
