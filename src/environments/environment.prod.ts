@@ -1,5 +1,4 @@
 export const environment = {
   production: true,
-  // Same-origin: CloudFront routes /api/* to the backend ALB (see infra/).
-  apiUrl: '/api',
+  apiUrl: 'https://interview-api.ayalab.co/api',
 };

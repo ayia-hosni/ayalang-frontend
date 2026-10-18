@@ -29,8 +29,9 @@ jobs:
     concurrency: deploy-frontend
 
     env:
-      DEPLOY_DIR: /opt/aya/frontend
       # The frontend service is defined in the backend compose file (shared network).
+      # Compose names the image <project>-<service>, i.e. backend-frontend.
+      IMAGE: backend-frontend:latest
       COMPOSE_FILE: /opt/aya/backend/docker-compose.yml
 
     steps:
@@ -42,19 +43,17 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+          printf 'Host *\n  ServerAliveInterval 30\n  ServerAliveCountMax 10\n' >> ~/.ssh/config
 
-      - name: Sync source
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p $DEPLOY_DIR"
-          rsync -az --delete \
-            --exclude '.git' --exclude '.github' --exclude 'node_modules' \
-            --exclude 'dist' --exclude '.angular' \
-            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:$DEPLOY_DIR/
+      # Build on the runner: the VPS can run out of memory during `ng build`.
+      - name: Build image
+        run: docker build -t "$IMAGE" .
 
-      - name: Build & restart
+      - name: Ship image & restart
         run: |
+          docker save "$IMAGE" | gzip | ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "gunzip | docker load"
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
             set -e
-            docker compose -f $COMPOSE_FILE up -d --build --no-deps frontend
+            docker compose -f $COMPOSE_FILE up -d --no-build --no-deps frontend
             docker image prune -f
           "
