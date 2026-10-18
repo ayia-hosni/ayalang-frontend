@@ -16,8 +16,24 @@ export interface Question {
   id: string;
   text: string;
   hints: string[];
+  exampleAnswers: string[];
+  track: string | null;
+  stack: string | null;
+  difficulty: string | null;
   category: Category;
   subQuestions: SubQuestion[];
+}
+
+export interface ExampleAnswer {
+  text: string;
+  source: 'stored';
+}
+
+export interface GrammarIssue {
+  message: string;
+  offset: number;
+  length: number;
+  replacements: string[];
 }
 
 export interface Recording {
@@ -26,6 +42,9 @@ export interface Recording {
   createdAt: string;
   subQuestionId: string | null;
   playbackUrl: string;
+  transcript: string | null;
+  correctedText: string | null;
+  grammarIssues: GrammarIssue[] | null;
 }
 
 export interface AuthUser {

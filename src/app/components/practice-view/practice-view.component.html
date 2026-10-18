@@ -67,6 +67,20 @@
             {{ showHints() ? 'Hide hints' : 'Show hints' }}
           </button>
         }
+        <button
+          type="button"
+          (click)="toggleExample()"
+          class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border transition-colors"
+          [class.bg-purple-500]="showExample()"
+          [class.text-white]="showExample()"
+          [class.border-purple-500]="showExample()"
+          [class.bg-white]="!showExample()"
+          [class.text-gray-600]="!showExample()"
+          [class.border-gray-200]="!showExample()"
+        >
+          <svg lucideSparkles [size]="16"></svg>
+          {{ showExample() ? 'Hide example' : 'Inspire me' }}
+        </button>
       </div>
 
       <!-- Sub-question chips -->
@@ -114,6 +128,29 @@
               </li>
             }
           </ul>
+        </div>
+      }
+
+      <!-- Example answer panel -->
+      @if (showExample()) {
+        <div class="bg-purple-50 border border-purple-100 rounded-2xl p-4 mb-4 animate-in fade-in slide-in-from-top-2 duration-200">
+          @if (loadingExample()) {
+            <p class="text-sm text-purple-500 flex items-center gap-2">
+              <svg lucideSparkles [size]="14" class="animate-pulse"></svg>
+              Coming up with an example answer…
+            </p>
+          } @else if (exampleError()) {
+            <p class="text-sm text-red-500">{{ exampleError() }}</p>
+          } @else if (exampleAnswer()) {
+            <p class="text-sm text-purple-900 italic leading-relaxed">"{{ exampleAnswer() }}"</p>
+            <button
+              type="button"
+              (click)="fetchExample(true)"
+              class="mt-3 text-xs font-semibold text-purple-500 hover:text-purple-700 transition-colors"
+            >
+              Show me another example
+            </button>
+          }
         </div>
       }
 

@@ -30,6 +30,105 @@
     }
   </div>
 
+  @if (availableDifficulties().length) {
+    <div class="flex flex-wrap gap-2 mb-4">
+      <button
+        type="button"
+        (click)="selectDifficulty(null)"
+        class="px-4 py-2 rounded-full text-xs font-bold border transition-colors"
+        [class.bg-green-500]="activeDifficulty() === null"
+        [class.text-white]="activeDifficulty() === null"
+        [class.border-green-500]="activeDifficulty() === null"
+        [class.bg-gray-50]="activeDifficulty() !== null"
+        [class.text-gray-500]="activeDifficulty() !== null"
+        [class.border-gray-200]="activeDifficulty() !== null"
+      >
+        All levels
+      </button>
+      @for (difficulty of availableDifficulties(); track difficulty) {
+        <button
+          type="button"
+          (click)="selectDifficulty(difficulty)"
+          class="px-4 py-2 rounded-full text-xs font-bold border transition-colors"
+          [class.bg-green-500]="activeDifficulty() === difficulty"
+          [class.text-white]="activeDifficulty() === difficulty"
+          [class.border-green-500]="activeDifficulty() === difficulty"
+          [class.bg-gray-50]="activeDifficulty() !== difficulty"
+          [class.text-gray-500]="activeDifficulty() !== difficulty"
+          [class.border-gray-200]="activeDifficulty() !== difficulty"
+        >
+          {{ difficulty }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (availableTracks().length) {
+    <div class="flex flex-wrap gap-2 mb-6">
+      <button
+        type="button"
+        (click)="selectTrack(null)"
+        class="px-4 py-2 rounded-full text-xs font-bold border transition-colors"
+        [class.bg-blue-500]="activeTrack() === null"
+        [class.text-white]="activeTrack() === null"
+        [class.border-blue-500]="activeTrack() === null"
+        [class.bg-gray-50]="activeTrack() !== null"
+        [class.text-gray-500]="activeTrack() !== null"
+        [class.border-gray-200]="activeTrack() !== null"
+      >
+        All
+      </button>
+      @for (track of availableTracks(); track track) {
+        <button
+          type="button"
+          (click)="selectTrack(track)"
+          class="px-4 py-2 rounded-full text-xs font-bold border transition-colors"
+          [class.bg-blue-500]="activeTrack() === track"
+          [class.text-white]="activeTrack() === track"
+          [class.border-blue-500]="activeTrack() === track"
+          [class.bg-gray-50]="activeTrack() !== track"
+          [class.text-gray-500]="activeTrack() !== track"
+          [class.border-gray-200]="activeTrack() !== track"
+        >
+          {{ track }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (availableStacks().length) {
+    <div class="flex flex-wrap gap-2 mb-6 pl-2">
+      <button
+        type="button"
+        (click)="selectStack(null)"
+        class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors"
+        [class.bg-purple-500]="activeStack() === null"
+        [class.text-white]="activeStack() === null"
+        [class.border-purple-500]="activeStack() === null"
+        [class.bg-white]="activeStack() !== null"
+        [class.text-gray-500]="activeStack() !== null"
+        [class.border-gray-200]="activeStack() !== null"
+      >
+        All stacks
+      </button>
+      @for (stack of availableStacks(); track stack) {
+        <button
+          type="button"
+          (click)="selectStack(stack)"
+          class="px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors"
+          [class.bg-purple-500]="activeStack() === stack"
+          [class.text-white]="activeStack() === stack"
+          [class.border-purple-500]="activeStack() === stack"
+          [class.bg-white]="activeStack() !== stack"
+          [class.text-gray-500]="activeStack() !== stack"
+          [class.border-gray-200]="activeStack() !== stack"
+        >
+          {{ stack }}
+        </button>
+      }
+    </div>
+  }
+
   <div class="space-y-3">
     @if (loading()) {
       <div class="text-center py-12 text-gray-400 text-sm">Loading questions…</div>
@@ -42,6 +141,14 @@
         >
           <div>
             <span class="text-[10px] uppercase font-bold tracking-wider text-blue-500">{{ q.category.title }}</span>
+            @if (q.difficulty) {
+              <span class="text-[10px] uppercase font-bold tracking-wider text-green-500 ml-2">{{ q.difficulty }}</span>
+            }
+            @if (q.track) {
+              <span class="text-[10px] uppercase font-bold tracking-wider text-gray-400 ml-2">
+                {{ q.track }}{{ q.stack ? ' · ' + q.stack : '' }}
+              </span>
+            }
             <p class="text-gray-800 font-semibold mt-1">{{ q.text }}</p>
             @if (q.subQuestions.length) {
               <p class="text-xs text-gray-400 mt-1">{{ q.subQuestions.length }} sub-questions · {{ q.hints.length }} hints</p>

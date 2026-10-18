@@ -1,17 +1,19 @@
-import { Component, input, output } from '@angular/core';
-import { LucideTrash2, LucidePlay } from '@lucide/angular';
+import { Component, input, output, signal } from '@angular/core';
+import { LucideTrash2, LucidePlay, LucideChevronRight } from '@lucide/angular';
 import { Recording } from '../../models/question.model';
 
 @Component({
   selector: 'app-recording-item',
   standalone: true,
-  imports: [LucideTrash2, LucidePlay],
+  imports: [LucideTrash2, LucidePlay, LucideChevronRight],
   templateUrl: './recording-item.component.html',
 })
 export class RecordingItemComponent {
   recording = input.required<Recording>();
   index = input.required<number>();
   deleted = output<void>();
+
+  showTranscript = signal(false);
 
   formatDuration(seconds: number): string {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');

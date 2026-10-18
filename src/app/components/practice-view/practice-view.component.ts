@@ -6,10 +6,12 @@ import {
   LucideSquare,
   LucideLightbulb,
   LucideListTree,
+  LucideSparkles,
 } from '@lucide/angular';
 import { Question, Recording } from '../../models/question.model';
 import { RecordingItemComponent } from '../recording-item/recording-item.component';
 import { RecordingsApiService } from '../../services/recordings-api.service';
+import { QuestionsApiService } from '../../services/questions-api.service';
 
 @Component({
   selector: 'app-practice-view',
@@ -21,6 +23,7 @@ import { RecordingsApiService } from '../../services/recordings-api.service';
     LucideSquare,
     LucideLightbulb,
     LucideListTree,
+    LucideSparkles,
     RecordingItemComponent,
   ],
   templateUrl: './practice-view.component.html',
@@ -34,6 +37,11 @@ export class PracticeViewComponent implements OnDestroy {
   activeSubQuestionId = signal<string | null>(null);
   showBreakdown = signal(false);
   showHints = signal(false);
+
+  showExample = signal(false);
+  exampleAnswer = signal<string | null>(null);
+  loadingExample = signal(false);
+  exampleError = signal<string | null>(null);
 
   isRecording = signal(false);
   recordingTime = signal(0);
@@ -59,7 +67,10 @@ export class PracticeViewComponent implements OnDestroy {
     this.allRecordings().filter((r) => r.subQuestionId === this.activeSubQuestionId()),
   );
 
-  constructor(private recordingsApi: RecordingsApiService) {
+  constructor(
+    private recordingsApi: RecordingsApiService,
+    private questionsApi: QuestionsApiService,
+  ) {
     effect(() => {
       const questionId = this.question().id;
       this.loadingRecordings.set(true);
@@ -70,6 +81,13 @@ export class PracticeViewComponent implements OnDestroy {
         },
         error: () => this.loadingRecordings.set(false),
       });
+    });
+
+    effect(() => {
+      this.question().id;
+      this.showExample.set(false);
+      this.exampleAnswer.set(null);
+      this.exampleError.set(null);
     });
   }
 
@@ -84,6 +102,30 @@ export class PracticeViewComponent implements OnDestroy {
 
   toggleHints() {
     this.showHints.update((v) => !v);
+  }
+
+  toggleExample() {
+    const opening = !this.showExample();
+    this.showExample.set(opening);
+    if (opening && !this.exampleAnswer() && !this.loadingExample()) {
+      this.fetchExample();
+    }
+  }
+
+  fetchExample(another = false) {
+    this.loadingExample.set(true);
+    this.exampleError.set(null);
+    const exclude = another ? (this.exampleAnswer() ?? undefined) : undefined;
+    this.questionsApi.getExampleAnswer(this.question().id, exclude).subscribe({
+      next: (example) => {
+        this.exampleAnswer.set(example.text);
+        this.loadingExample.set(false);
+      },
+      error: () => {
+        this.exampleError.set("Couldn't load an example answer for this question.");
+        this.loadingExample.set(false);
+      },
+    });
   }
 
   formatTime(totalSeconds: number): string {
